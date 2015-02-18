@@ -968,6 +968,19 @@ class IssueTests(unittest.TestCase):
         self.assertEqual(issue.fields.assignee.name, 'ci-admin')
         self.assertEqual(issue.fields.status.id, '5')
 
+    def test_transition_issue_with_transition_name(self):
+        issue = self.jira.create_issue(project=self.project_b,
+                                       summary='Test issue for transition by name created',
+                                       description='blahery',
+                                       issuetype={'name': 'Bug'},
+                                       customfield_10022='XSS')
+
+        self.jira.transition_issue(issue.key, 'resolve')
+
+        issue = self.jira.issue(issue.key)
+        self.assertTrue('resolved', issue.fields.status.name,"Status not as expected. Expected 'resolved', was: '{}'",
+                        issue.fields.status.name)
+
     def test_votes(self):
         self.jira_normal.remove_vote(self.issue_1)
         # not checking the result on this
