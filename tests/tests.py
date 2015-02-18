@@ -972,14 +972,34 @@ class IssueTests(unittest.TestCase):
         issue = self.jira.create_issue(project=self.project_b,
                                        summary='Test issue for transition by name created',
                                        description='blahery',
-                                       issuetype={'name': 'Bug'},
-                                       customfield_10022='XSS')
+                                       issuetype={'name': 'Bug'})
 
-        self.jira.transition_issue(issue.key, 'resolve')
+        self.jira.transition_issue(issue.key, 'Resolve Issue')
 
         issue = self.jira.issue(issue.key)
-        self.assertTrue('resolved', issue.fields.status.name,"Status not as expected. Expected 'resolved', was: '{}'",
-                        issue.fields.status.name)
+        self.assertEqual("Resolved", issue.fields.status.name,
+                         "Status not as expected. Expected 'resolved', was: '{}'".format(issue.fields.status.name))
+
+    def test_transition_issue_with_transition_name_lowercase(self):
+        issue = self.jira.create_issue(project=self.project_b,
+                                       summary='Test issue for transition by name created',
+                                       description='blahery',
+                                       issuetype={'name': 'Bug'})
+
+        self.jira.transition_issue(issue.key, 'resolve issue')
+
+        issue = self.jira.issue(issue.key)
+        self.assertEqual("Resolved", issue.fields.status.name,
+                         "Status not as expected. Expected 'resolved', was: '{}'".format(issue.fields.status.name))
+
+    def test_transition_incorrect_name_error(self):
+        issue = self.jira.create_issue(project=self.project_b,
+                                       summary='Test issue for transition by name - expect error',
+                                       description='blahery',
+                                       issuetype={'name': 'Bug'})
+
+        self.assertRaises(jira.utils.JIRAError, self.jira.transition_issue, issue.key, 'ThisIsNotRight')
+
 
     def test_votes(self):
         self.jira_normal.remove_vote(self.issue_1)

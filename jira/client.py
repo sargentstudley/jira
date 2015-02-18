@@ -917,10 +917,10 @@ class JIRA(object):
         :param issue: ID or key of the issue to get the transitions from
         :param trans_name: iname of transition we are looking for
         """
-        transitions_json = this.transitions(issue)
+        transitions_json = self.transitions(issue)
         id = None
 
-        for transition in transtitions_json["transtions"]:
+        for transition in transitions_json:
             if transition["name"].lower() == transition_name.lower():
                 id = transition["id"]
                 break
@@ -952,7 +952,7 @@ class JIRA(object):
             # cannot cast to int, so try to find transitionId by name
             transitionId = self.find_transitionid_by_name(issue, transition)
             if transitionId is None:
-                 raise JIRAError("Invalid transition name. %s" % transition)
+                 raise JIRAError("Invalid transition name: %s" % transition)
         
         data = {
             'transition': {
